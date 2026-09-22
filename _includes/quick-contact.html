@@ -1,0 +1,25 @@
+<nav class="quick-contact" id="quickContact" aria-label="Quick contact">
+  <a class="quick-contact-link" data-contact="call" href="tel:+18604145562" aria-label="Call JD Mobile Detailing"><svg class="icon" aria-hidden="true"><use href="#icon-phone"></use></svg><span>Call</span></a>
+  <a class="quick-contact-link" data-contact="text" href="sms:+18604145562" aria-label="Text JD Mobile Detailing"><svg class="icon" aria-hidden="true"><use href="#icon-mail"></use></svg><span>Text</span></a>
+  <a class="quick-contact-link quick-contact-quote" href="#book"><svg class="icon" aria-hidden="true"><use href="#icon-calendar"></use></svg><span>Get a Quote</span></a>
+</nav>
+<script>
+/* Reuse existing contact destinations. No contact or booking is sent automatically. */
+(() => {
+  const dock = document.getElementById('quickContact');
+  if (!dock) return;
+  const phoneLink = document.querySelector('.site-phone-link');
+  const textLink = document.querySelector('.site-sms-link');
+  if (phoneLink) dock.querySelector('[data-contact="call"]').href = phoneLink.href;
+  if (textLink) dock.querySelector('[data-contact="text"]').href = textLink.href;
+  // Keep the dock out of the way while a visitor fills in either form.
+  const updateInputState = () => {
+    const active = document.activeElement;
+    const editing = active && active.matches('input, textarea, select, [contenteditable="true"]');
+    document.body.classList.toggle('contact-input-active', Boolean(editing));
+  };
+  document.addEventListener('focusin', updateInputState);
+  document.addEventListener('focusout', () => setTimeout(updateInputState, 0));
+  updateInputState();
+})();
+</script>

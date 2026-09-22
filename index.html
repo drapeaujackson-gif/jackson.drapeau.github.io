@@ -8,4 +8,5 @@ GitHub Pages combines it with these small, editable additions when it builds the
 {%- capture original_site -%}{%- include site-original.html -%}{%- endcapture -%}
 {%- capture enhanced_head -%}<style>{% include site-enhancements.css %}</style></head>{%- endcapture -%}
 {%- capture before_booking -%}{% include faq.html %}<section aria-labelledby="book-title"{%- endcapture -%}
-{{- original_site | replace: '</head>', enhanced_head | replace: '<section aria-labelledby="book-title"', before_booking -}}
+{%- capture enhanced_body -%}{% include quick-contact.html %}</body>{%- endcapture -%}
+{{- original_site | replace: '</head>', enhanced_head | replace: '<section aria-labelledby="book-title"', before_booking | replace: '</body>', enhanced_body -}}

@@ -15,3 +15,16 @@
 .faq-answer a { display: inline-flex; align-items: center; gap: .5rem; min-height: 2.75rem; margin-top: .5rem; color: var(--primary-bright); font-weight: 750; text-decoration: underline; text-underline-offset: .2em; }
 @media (max-width: 52rem) { .faq-layout { grid-template-columns: 1fr; gap: 2rem; } }
 @media (max-width: 25rem) { .faq-item summary, .faq-answer { padding-left: 1rem; padding-right: 1rem; } }
+
+/* Mobile quick contact: safe-area space, touch-sized controls, no content overlap. */
+.quick-contact { display: none; }
+@media (max-width: 44rem) {
+  html { scroll-padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); }
+  body { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); }
+  .quick-contact { position: fixed; z-index: 950; inset: auto 0 0; display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: .5rem; padding: .75rem max(.75rem, env(safe-area-inset-right, 0px)) calc(.75rem + env(safe-area-inset-bottom, 0px)) max(.75rem, env(safe-area-inset-left, 0px)); background: rgba(13, 13, 16, .97); border-top: 1px solid var(--border); box-shadow: 0 -8px 28px rgba(0, 0, 0, .3); }
+  .quick-contact-link { display: flex; align-items: center; justify-content: center; gap: .45rem; min-width: 0; min-height: 3rem; border: 1px solid var(--border); border-radius: 999px; color: var(--foreground); background: var(--surface); font-size: .85rem; font-weight: 800; text-align: center; }
+  .quick-contact-link:hover { border-color: var(--primary-bright); }
+  .quick-contact-quote { border-color: transparent; background: var(--gradient-accent); color: var(--primary-foreground); }
+  body.menu-open .quick-contact, body.photo-lightbox-open .quick-contact, body.contact-input-active .quick-contact { display: none; }
+}
+@media print { .quick-contact { display: none !important; } }
