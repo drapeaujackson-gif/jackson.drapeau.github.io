@@ -1,0 +1,17 @@
+/* FAQ: native details elements work with a keyboard and without JavaScript. */
+.faq-layout { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: clamp(2rem, 5vw, 5rem); align-items: start; }
+.faq-intro .button { margin-top: 1.6rem; }
+.faq-list { display: grid; gap: .8rem; min-width: 0; }
+.faq-item { border: 1px solid var(--border); border-radius: var(--radius-xl); background: var(--surface); overflow: hidden; }
+.faq-item[open] { border-color: var(--primary); }
+.faq-item summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 4.3rem; padding: 1.2rem 1.4rem; list-style: none; cursor: pointer; font-weight: 800; line-height: 1.45; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary:hover { background: rgba(255, 77, 46, .06); }
+.faq-item summary:focus-visible { outline-offset: -4px; }
+.faq-symbol { display: grid; flex: 0 0 1.6rem; place-items: center; color: var(--primary-bright); font-size: 1.5rem; line-height: 1; transition: transform 180ms ease; }
+.faq-item[open] .faq-symbol { transform: rotate(45deg); }
+.faq-answer { padding: 0 1.4rem 1.35rem; color: var(--muted-foreground); line-height: 1.75; font-size: .95rem; }
+.faq-answer strong { color: var(--foreground); }
+.faq-answer a { display: inline-flex; align-items: center; gap: .5rem; min-height: 2.75rem; margin-top: .5rem; color: var(--primary-bright); font-weight: 750; text-decoration: underline; text-underline-offset: .2em; }
+@media (max-width: 52rem) { .faq-layout { grid-template-columns: 1fr; gap: 2rem; } }
+@media (max-width: 25rem) { .faq-item summary, .faq-answer { padding-left: 1rem; padding-right: 1rem; } }
