@@ -2524,7 +2524,7 @@
 <div class="surface-card contact-card">
 <p>Prefer to speak directly?</p>
 <strong class="site-phone-text">Call or text (860) 414-5562</strong>
-<p style="margin-top:.45rem">Operating season: <span data-site="season">May–September</span></p>
+<p style="margin-top:.45rem">Operating season: <span data-site="season">May 1–October 31 every year</span></p>
 </div>
 </div>
 <form class="surface-card quote-form reveal" id="quoteForm" novalidate="">
@@ -2599,7 +2599,8 @@
 </div>
 <div class="field">
 <label for="preferredDate">Preferred date</label>
-<input id="preferredDate" name="preferredDate" type="date"/>
+<input aria-describedby="preferredDateHelp preferredDateError" id="preferredDate" name="preferredDate" type="date"/>
+<p class="form-note" id="preferredDateHelp">Choose a date in the current or next operating season, May 1–October 31. Leave blank if you are flexible.</p>
 <span class="field-error" id="preferredDateError"></span>
 </div>
 <div class="field">
@@ -2670,7 +2671,7 @@
 </div></details>
 <details class="policy-panel" id="terms-and-conditions"><summary><span>Terms and Conditions<small>Quotes, appointments, and customer feedback</small></span><span aria-hidden="true" class="policy-toggle">+</span></summary><div class="legal-body">
 <p class="policy-date">Last updated: <span data-site="policyDate">September 15, 2026</span></p>
-<p>These terms describe the use of the JD Mobile Detailing website and the basis on which detailing services may be requested. Our service area is <span data-site="serviceArea">Rocky Hill, CT and surrounding towns</span>, with an operating season of <span data-site="season">May–September</span>. Your agreed written quote identifies the work, price, and appointment arrangements for your vehicle.</p>
+<p>These terms describe the use of the JD Mobile Detailing website and the basis on which detailing services may be requested. Our service area is <span data-site="serviceArea">Rocky Hill, CT and surrounding towns</span>, with an operating season of <span data-site="season">May 1–October 31 every year</span>. Your agreed written quote identifies the work, price, and appointment arrangements for your vehicle.</p>
 <h3>1. Requests and appointment confirmation</h3>
 <p>Submitting information through an email request does not reserve a time, create a confirmed appointment, or authorize a charge. An appointment is confirmed only after you approve the quote and JD Mobile Detailing confirms the date and time. You must be the vehicle owner or have the owner’s authority to request and authorize the work. Any specific written terms agreed for your appointment apply alongside these terms and take priority in a conflict to the extent allowed by law.</p>
 <h3>2. Starting prices and individual quotes</h3>
@@ -2759,7 +2760,7 @@
 <li><a class="site-phone-link site-phone-text" href="tel:+18604145562">(860) 414-5562</a></li>
 <li><a class="site-email-link" href="mailto:jdrapeau@hartford.edu"><span data-site="email">jdrapeau@hartford.edu</span></a></li>
 <li><span data-site="shortArea">Rocky Hill, CT</span></li>
-<li><span>Season: <span data-site="season">May–September</span></span></li>
+<li><span>Season: <span data-site="season">May 1–October 31 every year</span></span></li>
 <li><a class="site-sms-link" href="sms:+18604145562">Send a text message</a></li></ul>
 </div>
 </div>
@@ -2786,7 +2787,7 @@ const SITE = {
   "phoneDisplay": "(860) 414-5562",
   "phoneHref": "+18604145562",
   "email": "jdrapeau@hartford.edu",
-  "season": "May–September",
+  "season": "May 1–October 31 every year",
   "reviewUrl": "#leave-review",
   "policyDate": "September 15, 2026",
   "towns": [
@@ -3033,11 +3034,24 @@ function validateField(field) {
   if (field.type === 'checkbox') {
     return !field.required || field.checked || showError(field, 'Please confirm this before continuing.');
   }
+  if (field.id === 'preferredDate') {
+    updatePreferredDateRange();
+    if (field.validity.badInput) return showError(field, 'Enter a complete, valid date.');
+  }
   const value = field.value.trim();
   if (field.required && !value) return showError(field, 'This field is required.');
   if (!value) return true;
   if (field.type === 'email' && !field.validity.valid) return showError(field, 'Enter a valid email address.');
-  if (field.type === 'date' && !field.validity.valid) return showError(field, 'Choose today or a future date.');
+  if (field.id === 'preferredDate') {
+    const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    const date = parts && new Date(Number(parts[1]), Number(parts[2]) - 1, Number(parts[3]));
+    if (!parts || date.getFullYear() !== Number(parts[1]) || date.getMonth() !== Number(parts[2]) - 1 || date.getDate() !== Number(parts[3])) {
+      return showError(field, 'Enter a complete, valid date.');
+    }
+    if (!field.validity.valid || value < field.min || value > field.max) {
+      return showError(field, `Choose a date from ${field.min} through ${field.max}. Our season is May 1–October 31 every year.`);
+    }
+  }
   if (field.id === 'zip' && !/^\d{5}(-\d{4})?$/.test(value)) return showError(field, 'Enter a valid 5-digit ZIP code.');
   if (field.id === 'phone') {
     const digits = value.replace(/\D/g, '');
@@ -3112,8 +3126,18 @@ function bindDraftTools(prefix) {
 const quoteForm = document.getElementById('quoteForm');
 const serviceSelect = document.getElementById('serviceSelect');
 const preferredDate = document.getElementById('preferredDate');
-const now = new Date();
-preferredDate.min = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+function updatePreferredDateRange() {
+  const now = new Date();
+  // Use the visitor's local calendar day, including near midnight and year changes.
+  const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const seasonYear = now.getFullYear() + (now.getMonth() > 9 ? 1 : 0);
+  const seasonStart = `${seasonYear}-05-01`;
+  preferredDate.min = today > seasonStart ? today : seasonStart;
+  preferredDate.max = `${seasonYear}-10-31`;
+}
+updatePreferredDateRange();
+// Refresh when returning to a page left open across midnight or the season boundary.
+preferredDate.addEventListener('focus', updatePreferredDateRange);
 const quoteFields = ['fullName','phone','email','vehicle','serviceSelect','zip','preferredDate','acknowledgment'].map(id => document.getElementById(id));
 addFieldValidation(quoteFields);
 const formStatus = document.getElementById('formStatus');
