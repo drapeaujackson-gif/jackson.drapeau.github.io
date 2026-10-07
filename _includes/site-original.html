@@ -3035,8 +3035,8 @@ function validateField(field) {
     return !field.required || field.checked || showError(field, 'Please confirm this before continuing.');
   }
   if (field.id === 'preferredDate') {
-    updatePreferredDateRange();
     if (field.validity.badInput) return showError(field, 'Enter a complete, valid date.');
+    updatePreferredDateRange();
   }
   const value = field.value.trim();
   if (field.required && !value) return showError(field, 'This field is required.');
@@ -3132,8 +3132,11 @@ function updatePreferredDateRange() {
   const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
   const seasonYear = now.getFullYear() + (now.getMonth() > 9 ? 1 : 0);
   const seasonStart = `${seasonYear}-05-01`;
-  preferredDate.min = today > seasonStart ? today : seasonStart;
-  preferredDate.max = `${seasonYear}-10-31`;
+  const minimum = today > seasonStart ? today : seasonStart;
+  const maximum = `${seasonYear}-10-31`;
+  // Reassigning date limits can erase an incomplete native date entry in Chromium.
+  if (preferredDate.min !== minimum) preferredDate.min = minimum;
+  if (preferredDate.max !== maximum) preferredDate.max = maximum;
 }
 updatePreferredDateRange();
 // Refresh when returning to a page left open across midnight or the season boundary.
